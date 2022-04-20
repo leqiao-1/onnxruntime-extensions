@@ -6,3 +6,4 @@ requires-python = "<3.10"
 [build-system]
 # Minimum requirements for the build system to execute.
 requires = ["setuptools", "wheel", "numpy>=1.18.5"]  # PEP 508 specifications.
+build-backend = "setuptools.build_meta"

@@ -9,7 +9,8 @@ FetchContent_GetProperties(pybind11)
 string(TOLOWER "pybind11" lcName)
 if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
-  FetchContent_Populate(pybind11)
+  # FetchContent_Populate(pybind11)
+  FetchContent_MakeAvailable(pybind11)
 endif()
 
 set(pybind11_INCLUDE_DIRS ${pybind11_SOURCE_DIR}/include)

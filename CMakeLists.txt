@@ -7,13 +7,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose build type: Debug Release RelWithDebInfo." FORCE)
 endif()
 
-
 set(CPACK_PACKAGE_NAME "onnxruntime_extensions")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "3")
 set(CPACK_PACKAGE_VERSION_PATCH "1")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 
+# Define CMAKE_INSTALL_xxx: LIBDIR, INCLUDEDIR
+include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -287,6 +288,8 @@ target_link_libraries(ocos_operators PRIVATE ${ocos_libraries})
 
 file(GLOB shared_TARGET_SRC "shared/*.cc" "shared/*.h")
 if(OCOS_ENABLE_PYTHON)
+  message(STATUS "Fetch pybind11")
+  include(pybind11)
   set(Python3_FIND_REGISTRY NEVER CACHE STRING "...")
   if(NOT "${Python3_FIND_REGISTRY}" STREQUAL "NEVER")
     message(FATAL_ERROR "Python3_FIND_REGISTRY is not NEVER")
@@ -300,7 +303,9 @@ if(OCOS_ENABLE_PYTHON)
   endif()
 
   file(GLOB TARGET_SRC_PYOPS "pyop/*.cc" "pyop/*.h")
-  add_library(ortcustomops SHARED ${TARGET_SRC_PYOPS} ${shared_TARGET_SRC})
+  # add_library(ortcustomops SHARED ${TARGET_SRC_PYOPS} ${shared_TARGET_SRC})
+  pybind11_add_module(ortcustomops MODULE ${TARGET_SRC_PYOPS} ${shared_TARGET_SRC})
+
   list(APPEND OCOS_COMPILE_DEFINITIONS PYTHON_OP_SUPPORT)
   # building static lib has higher priority
 elseif(OCOS_ENABLE_STATIC_LIB)
@@ -338,8 +343,6 @@ target_compile_definitions(ortcustomops PRIVATE  ${OCOS_COMPILE_DEFINITIONS})
 target_link_libraries(ortcustomops PUBLIC ocos_operators)
 
 if(OCOS_ENABLE_PYTHON)
-  message(STATUS "Fetch pybind11")
-  include(pybind11)
   target_include_directories(ortcustomops PRIVATE
     $<TARGET_PROPERTY:Python3::Module,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:Python3::NumPy,INTERFACE_INCLUDE_DIRECTORIES>
@@ -359,6 +362,7 @@ if(OCOS_ENABLE_PYTHON)
         SUFFIX "")
     endif()
   endif()
+  install(TARGETS ortcustomops DESTINATION .)
 endif()
 
 
