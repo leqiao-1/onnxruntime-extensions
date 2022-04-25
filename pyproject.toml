@@ -1,7 +1,11 @@
 [project]
 name = "onnxruntime_extensions"
+version = "0.4.2"
+description = "extended onnxruntime for more"
 # since onnxruntime havn't supported Python 3.10 yet
 requires-python = "<3.10"
+license = "MIT"
+readme = "README.md"
 
 [build-system]
 # Minimum requirements for the build system to execute.
